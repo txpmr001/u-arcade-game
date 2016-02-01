@@ -1,10 +1,8 @@
 // Enemies our player must avoid
-var Enemy = function() {
+var Enemy = function(point) {
     // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
-
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
+    this.x = point.x;
+    this.y = point.y;
     this.sprite = 'images/enemy-bug.png';
 };
 
@@ -14,6 +12,7 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
+	this.x += dt * 200;
 };
 
 // Draw the enemy on the screen, required method for game
@@ -26,10 +25,6 @@ Enemy.prototype.render = function() {
 // a handleInput() method.
 var Player = function(x, y) {
     // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
-
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
     this.x = x;
     this.y = y;
     this.sprite = 'images/char-boy.png';
@@ -57,10 +52,19 @@ Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+genPoint = function() {
+	var x = (Math.floor((Math.random() * 5000) + 1)) *  -1;
+	var y = (Math.floor((Math.random() *    3) + 1)) *  83;
+	return {'x': x, 'y': y};
+};
+
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-allEnemies = [];
+var allEnemies = [];
+for (var i=0; i<30; i++) {
+	allEnemies.push(new Enemy(genPoint()));
+}
 var player = new Player(202, 415);
 
 // This listens for key presses and sends the keys to your
