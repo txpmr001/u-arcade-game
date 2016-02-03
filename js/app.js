@@ -1,3 +1,12 @@
+var numCols   =   5;
+var numRows   =   6;
+var colWidth  = 101;
+var rowHeight =  83;
+var col = ['dummy'];
+var row = ['dummy'];
+for (var x=0; x<numCols; x++) {col.push(x*colWidth);};
+for (var y=0; y<numRows; y++) {row.push(y*rowHeight);};
+
 // Enemies our player must avoid
 var Enemy = function(location) {
     // Variables applied to each of our instances go here,
@@ -15,6 +24,10 @@ Enemy.prototype.update = function(dt) {
     // which will ensure the game runs at the same speed for
     // all computers.
 	this.x += dt * 200;
+	if (collision(this, player)) {
+		player.x = col[3];
+		player.y = row[6];		
+	}
 };
 
 // Draw the enemy on the screen, required method for game
@@ -36,10 +49,10 @@ Player.prototype.width = 66;
 
 // Update the player's position, required method for game
 Player.prototype.update = function(key) {
-	if      (key == 'up'    & this.y >=  83) { this.y -=  83; }
-	else if (key == 'down'  & this.y <= 332) { this.y +=  83; }
-	else if (key == 'left'  & this.x >= 101) { this.x -= 101; }
-	else if (key == 'right' & this.x <= 303) { this.x += 101; }
+	if      (key == 'up'    & this.y > row[1]) { this.y -= rowHeight; }
+	else if (key == 'down'  & this.y < row[6]) { this.y += rowHeight; }
+	else if (key == 'left'  & this.x > col[1]) { this.x -= colWidth; }
+	else if (key == 'right' & this.x < col[5]) { this.x += colWidth; }
 };
 
 // Draw the player on the screen, required method for game
@@ -60,7 +73,7 @@ var allEnemies = [];
 for (var i=0; i<30; i++) {
 	allEnemies.push(new Enemy(randomLocation()));
 };
-var player = new Player({'x': 202, 'y': 415});
+var player = new Player({'x': col[3], 'y': row[6]});
 
 // Decide what to do when a key is pressed
 var handleInput = function(key) {
@@ -80,3 +93,14 @@ document.addEventListener('keyup', function(e) {
     };
     handleInput(allowedKeys[e.keyCode]);
 });
+
+var collision = function(obj1, obj2) {
+	obj1x = obj1.x + ((colWidth - obj1.width) / 2);
+	obj2x = obj2.x + ((colWidth - obj2.width) / 2);
+	return obj1.y == obj2.y && obj1x < (obj2x+obj2.width) && (obj1x+obj1.width) > obj2x;
+};
+
+
+
+
+
