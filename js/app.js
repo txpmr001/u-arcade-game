@@ -1,21 +1,42 @@
-var numCols   =   5;
-var numRows   =   6;
-var colWidth  = 101;
-var rowHeight =  83;
-var col = ['dummy'];
+// use semantic variables to make player location simpler and easier to understand
+var canvasWidth  = 505;
+var canvasHeight = 606;
+var numCols      =   5;
+var numRows      =   6;
+var colWidth     = 101;
+var rowHeight    =  83;
+var col = ['dummy'];	// dummy values make col and row indexes 1-based
 var row = ['dummy'];
 for (var x=0; x<numCols; x++) {col.push(x*colWidth);};
 for (var y=0; y<numRows; y++) {row.push(y*rowHeight);};
 
+var collides = function(obj1, array2) {
+	obj1x = obj1.x + ((colWidth - obj1.width) / 2);
+	var arrayLength = array2.length;
+	var collision   = 0;
+	for (var i=0; i<arrayLength; i++) {
+		obj2  = array2[i];
+		if (obj1 === obj2) { continue; };
+		obj2x = obj2.x + ((colWidth - obj2.width) / 2);
+		collision = collision || obj1.y == obj2.y && obj1x < (obj2x+obj2.width) && (obj1x+obj1.width) > obj2x;
+	};
+	return collision;
+};
+
 // Enemies our player must avoid
-var Enemy = function(location) {
+var Enemy = function() {
     // Variables applied to each of our instances go here,
-    this.x = location.x;
-    this.y = location.y;
     this.sprite = 'images/enemy-bug.png';
 };
 
 Enemy.prototype.width = 96;
+
+Enemy.prototype.randomLocation = function() {
+	do {
+		this.x = (Math.floor((Math.random() * 1000) + colWidth)) * -1;
+		this.y = (Math.floor((Math.random() *    3) + 1)) * rowHeight;
+	} while (collides(this, allEnemies));
+};
 
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
@@ -24,9 +45,12 @@ Enemy.prototype.update = function(dt) {
     // which will ensure the game runs at the same speed for
     // all computers.
 	this.x += dt * 200;
-	if (collision(this, player)) {
+	if (collides(this, [player])) {
 		player.x = col[3];
 		player.y = row[6];		
+	}
+	if (this.x > canvasWidth) {
+		this.randomLocation();
 	}
 };
 
@@ -60,18 +84,14 @@ Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-var randomLocation = function() {
-	var x = (Math.floor((Math.random() * 5000) + 1)) *  -1;
-	var y = (Math.floor((Math.random() *    3) + 1)) *  83;
-	return {'x': x, 'y': y};
-};
-
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 var allEnemies = [];
-for (var i=0; i<30; i++) {
-	allEnemies.push(new Enemy(randomLocation()));
+for (var i=0; i<10; i++) {
+	enemy = new Enemy();
+	enemy.randomLocation();
+	allEnemies.push(enemy);
 };
 var player = new Player({'x': col[3], 'y': row[6]});
 
@@ -93,14 +113,5 @@ document.addEventListener('keyup', function(e) {
     };
     handleInput(allowedKeys[e.keyCode]);
 });
-
-var collision = function(obj1, obj2) {
-	obj1x = obj1.x + ((colWidth - obj1.width) / 2);
-	obj2x = obj2.x + ((colWidth - obj2.width) / 2);
-	return obj1.y == obj2.y && obj1x < (obj2x+obj2.width) && (obj1x+obj1.width) > obj2x;
-};
-
-
-
 
 
