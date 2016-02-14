@@ -44,7 +44,7 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
-	this.x += dt * 200;
+	this.x += dt * (((this.y/rowHeight)*100));
 	if (collides(this, [player])) {
 		player.x = col[3];
 		player.y = row[6];		
@@ -56,7 +56,7 @@ Enemy.prototype.update = function(dt) {
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y-20);
 };
 
 // Now write your own player class
@@ -67,6 +67,8 @@ var Player = function(location) {
     this.x = location.x;
     this.y = location.y;
     this.sprite = 'images/char-boy.png';
+    this.lives  = 3;
+    this.score  = 500;
 };
 
 Player.prototype.width = 66;
@@ -76,12 +78,16 @@ Player.prototype.update = function(key) {
 	if      (key == 'up'    & this.y > row[1]) { this.y -= rowHeight; }
 	else if (key == 'down'  & this.y < row[6]) { this.y += rowHeight; }
 	else if (key == 'left'  & this.x > col[1]) { this.x -= colWidth; }
-	else if (key == 'right' & this.x < col[5]) { this.x += colWidth; }
+	else if (key == 'right' & this.x < col[5]) { this.x += colWidth; };
 };
 
 // Draw the player on the screen, required method for game
 Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y-10);
+	ctx.font = '30px sans-serif';
+	ctx.fillStyle = 'black';
+	ctx.fillText('SCORE: ' + ('0000'+player.score.toString()).slice(-4), 60, 40);
+	ctx.fillText('LIVES: ' + player.lives.toString(), 300, 40);
 };
 
 // Now instantiate your objects.
@@ -113,5 +119,10 @@ document.addEventListener('keyup', function(e) {
     };
     handleInput(allowedKeys[e.keyCode]);
 });
+
+
+
+
+
 
 
