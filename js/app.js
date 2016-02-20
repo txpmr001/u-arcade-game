@@ -68,15 +68,16 @@ Enemy.prototype.render = function() {
 //---------------------------------------------------------- Gem Class
 var Gem = function() {
     // Variables applied to each of our instances go here,
-    this.sprite = 'images/Gem Blue.png';
-    this.visible = 1;
+    this.sprite      = 'images/Gem Blue.png';
+	this.width       = 96;
+    this.visible     = 0;
 };
 
-Gem.prototype.width = 96;
-
-Gem.prototype.randomLocation = function() {
-	this.x = col[Math.floor((Math.random() * 5) + 1)];
-	this.y = row[Math.floor((Math.random() * 3) + 2)];
+Gem.prototype.randomize = function() {
+	this.x = col[Math.floor((Math.random() * 5) + 1)];			/* col 1 to 5     */
+	this.y = row[Math.floor((Math.random() * 3) + 2)];			/* row 2 to 4     */
+	this.displayWait = Math.floor((Math.random() * 5) + 3);		/* 3 to 7 seconds */
+	this.displayTime = Math.floor((Math.random() * 3) + 3);		/* 3 to 5 seconds */
 };
 
 Gem.prototype.update = function(dt) {
@@ -86,7 +87,21 @@ Gem.prototype.update = function(dt) {
 	if (this.visible & collides(this, [player])) {
 		player.score += 100;
 		this.visible = 0;
-	};
+		this.randomize();
+	}
+	else if (this.visible) {
+		this.displayTime -= dt;
+		if (this.displayTime <= 0) {
+			this.visible = 0;
+			this.randomize();
+		};
+	}
+    else if (!this.visible & this.displayWait > 0) {
+		this.displayWait -= dt;
+		if (this.displayWait <= 0) {
+			this.visible = 1;
+		};
+    };
 };
 
 // Draw the enemy on the screen, required method for game
@@ -135,12 +150,13 @@ Player.prototype.update = function(key) {
 // Draw the player on the screen, required method for game
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y-10);
-	ctx.fillStyle = 'white';
-	ctx.fillRect(0, 0, canvasWidth, 50);
-	ctx.font = '30px sans-serif';
+	ctx.clearRect(0, 0, canvasWidth, 50);
+	ctx.font      = '30px sans-serif';
 	ctx.fillStyle = 'black';
 	ctx.fillText('SCORE: ' + ('0000'+player.score.toString()).slice(-4), 60, 40);
 	ctx.fillText('LIVES: ' + player.lives.toString(), 300, 40);
+	//ctx.globalAlpha = .8;
+	//ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 };
 
 //----------------------------------------------------------
@@ -154,7 +170,7 @@ for (var i=0; i<8; i++) {
 	allEnemies.push(enemy);
 };
 var gem = new Gem();
-gem.randomLocation();
+gem.randomize();
 var player = new Player({'x': col[3], 'y': row[6]});
 
 // Decide what to do when a key is pressed
@@ -176,9 +192,6 @@ document.addEventListener('keyup', function(e) {
     };
     handleInput(allowedKeys[e.keyCode]);
 });
-
-
-
 
 
 
