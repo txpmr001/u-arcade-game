@@ -130,6 +130,8 @@ Player.prototype.width = 66;
 // Update the player's position, required method for game
 Player.prototype.update = function(key) {
 	if (player.pause & key == 'space') {
+		ctx.globalAlpha = 1;
+		ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 		player.pause = 0;
 	}
 	else if (player.pause & key !== 'space') {
@@ -153,10 +155,18 @@ Player.prototype.render = function() {
 	ctx.clearRect(0, 0, canvasWidth, 50);
 	ctx.font      = '30px sans-serif';
 	ctx.fillStyle = 'black';
+	ctx.textAlign = 'left';
 	ctx.fillText('SCORE: ' + ('0000'+player.score.toString()).slice(-4), 60, 40);
 	ctx.fillText('LIVES: ' + player.lives.toString(), 300, 40);
-	//ctx.globalAlpha = .8;
-	//ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+	if (player.pause) {
+		ctx.globalAlpha = .5;
+		ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+ 		ctx.font      = '30px sans-serif';
+		ctx.fillStyle = 'white';
+		ctx.textAlign = 'center';
+		ctx.fillText('Press spacebar to start.', canvasWidth/2, 200);
+	}
 };
 
 //----------------------------------------------------------
@@ -172,6 +182,8 @@ for (var i=0; i<8; i++) {
 var gem = new Gem();
 gem.randomize();
 var player = new Player({'x': col[3], 'y': row[6]});
+
+
 
 // Decide what to do when a key is pressed
 var handleInput = function(key) {
