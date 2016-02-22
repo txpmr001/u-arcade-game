@@ -49,8 +49,7 @@ Enemy.prototype.update = function(dt) {
 	this.x += dt * (((this.y/rowHeight)*100));
 	if (collides(this, [player])) {
 		player.score = Math.max(0, player.score-100);
-		player.x = col[3];
-		player.y = row[6];		
+		player.startLocation();
 	};
 	if (this.x > canvasWidth) {
 		this.randomize();
@@ -113,34 +112,39 @@ Gem.prototype.render = function() {
 // Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
-var Player = function(location) {
+var Player = function() {
     // Variables applied to each of our instances go here,
-    this.x = location.x;
-    this.y = location.y;
+    this.startLocation();
     this.sprite        = 'images/char-boy.png';
 	this.width         = 66;
     this.lastTime      = 0;
     this.remainingTime = 0;
     this.score         = 0;
     this.pause         = 1;
+    this.showInstructions = 1;
+};
+
+//
+Player.prototype.startLocation = function() {
+	this.x = col[3];
+	this.y = row[6];
 };
 
 // Update the player's position, required method for game
 Player.prototype.update = function(key) {
 	if (this.pause & key == 'space') {
+		this.showInstructions = 0;
 		ctx.globalAlpha = 1;
 		ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 		if (allEnemies.length > 5) {
 			allEnemies.splice(5, allEnemies.length - 5);
 		}
-		this.x = col[3];
-		this.y = row[6];
 		this.lastTime       = Date.now();
-		this.remainingTime  = 60000;
+		this.remainingTime  = 30000;
 		this.score          = 0;
 		this.pause          = 0;
 	}
-	else if (player.pause & key !== 'space') {
+	else if (this.pause & key !== 'space') {
 	}
 	else if (key == 'up' & this.y > row[1]) {
 		this.y -= rowHeight;
@@ -149,8 +153,7 @@ Player.prototype.update = function(key) {
 			for (var i=0; i<2; i++) {
 				enemy = new Enemy();
 			};
-			this.x = col[3];
-			this.y = row[6];
+			this.startLocation();
 		};
 	}
 	else if (key == 'down'  & this.y < row[6]) { this.y += rowHeight; }
@@ -163,7 +166,10 @@ Player.prototype.update = function(key) {
 		this.remainingTime -= elapsedTime;
 		this.lastTime = thisTime;
 		console.log(elapsedTime + '     ' + player.remainingTime);
-		if (player.remainingTime <= 0) {player.pause = 1;};
+		if (this.remainingTime <= 0) {
+			this.pause = 1;
+			this.startLocation();
+		};
 	};
 };
 
@@ -185,13 +191,17 @@ Player.prototype.render = function() {
  		ctx.font      = '30px sans-serif';
 		ctx.fillStyle = 'white';
 		ctx.textAlign = 'center';
-		ctx.fillText('Use the arrow keys to move', canvasWidth/2, 160);
-		ctx.fillText('your character across the road.', canvasWidth/2, 195);
-		ctx.fillText('(+500 pts)', canvasWidth/2, 230);
-		ctx.fillText('Avoid enemy bugs. (-100 pts)', canvasWidth/2, 280);
-		ctx.fillText('Capture Blue Gems', canvasWidth/2, 330);
-		ctx.fillText('for bonus points. (+200 pts)', canvasWidth/2, 365);
-		ctx.fillText('Press spacebar to start.', canvasWidth/2, 440);
+		if (player.showInstructions) {
+			ctx.fillText('Use the arrow keys to move', canvasWidth/2, 160);
+			ctx.fillText('your character across the road', canvasWidth/2, 195);
+			ctx.fillText('to the water. (+500 pts)', canvasWidth/2, 230);
+			ctx.fillText('Avoid enemy bugs. (-100 pts)', canvasWidth/2, 280);
+			ctx.fillText('Capture Blue Gems', canvasWidth/2, 330);
+			ctx.fillText('for bonus points. (+200 pts)', canvasWidth/2, 365);
+			ctx.fillText('Press spacebar to start.', canvasWidth/2, 440);
+		} else {
+			ctx.fillText('Press spacebar to play again.', canvasWidth/2, 440);
+		};
 	};
 };
 
@@ -204,7 +214,7 @@ for (var i=0; i<5; i++) {
 	enemy = new Enemy();
 };
 var gem = new Gem();
-var player = new Player({'x': col[3], 'y': row[6]});
+var player = new Player();
 
 // Decide what to do when a key is pressed
 var handleInput = function(key) {
