@@ -1,6 +1,16 @@
 frontend-nanodegree-arcade-game
 ===============================
 
-Students should use this [rubric](https://www.udacity.com/course/viewer/#!/c-nd001/l-2696458597/m-2687128535) for self-checking their submission.
+### The arcade-game loads from page index.html.
 
-For detailed instructions on how to get started, check out this [guide](https://docs.google.com/document/d/1v01aScPjSWCCWQLIpFqvg3-vXLH2e8_SZQKC8jNO0Dc/pub?embedded=true).
+### Press SPACEBAR to start the game.
+
+### Use the arrow keys to move your character across the road to the water. (+500 points)
+
+### Avoid enemy bugs. (-100 points)
+
+### Caputre blue gems for bonus points. (+200 points)
+
+### Each game lasts 60 seconds.
+
+### Press SPACEBAR to play again.

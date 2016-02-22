@@ -140,7 +140,7 @@ Player.prototype.update = function(key) {
 			allEnemies.splice(5, allEnemies.length - 5);
 		}
 		this.lastTime       = Date.now();
-		this.remainingTime  = 30000;
+		this.remainingTime  = 60000;
 		this.score          = 0;
 		this.pause          = 0;
 	}
@@ -196,7 +196,7 @@ Player.prototype.render = function() {
 			ctx.fillText('your character across the road', canvasWidth/2, 195);
 			ctx.fillText('to the water. (+500 pts)', canvasWidth/2, 230);
 			ctx.fillText('Avoid enemy bugs. (-100 pts)', canvasWidth/2, 280);
-			ctx.fillText('Capture Blue Gems', canvasWidth/2, 330);
+			ctx.fillText('Capture blue gems', canvasWidth/2, 330);
 			ctx.fillText('for bonus points. (+200 pts)', canvasWidth/2, 365);
 			ctx.fillText('Press spacebar to start.', canvasWidth/2, 440);
 		} else {
