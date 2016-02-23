@@ -19,6 +19,7 @@ var collides = function(obj1, array2) {
 		obj2  = array2[i];
 		if (obj1 === obj2) { continue; };					// can't collide with yourself
 		obj2x = obj2.x + ((colWidth - obj2.width) / 2);		// x of object2 left edge
+		// use bounding box collision detection
 		collision = collision || obj1.y == obj2.y && obj1x < (obj2x+obj2.width) && (obj1x+obj1.width) > obj2x;
 	};
 	return collision;
@@ -91,7 +92,6 @@ Gem.prototype.update = function(dt) {
 			this.randomize();						//     generate a random location, delay, and duration
 		};
 	}
-//  else if (!this.visible & this.displayDelay > 0) {	// if gem is not visible
     else if (!this.visible) {						// if gem is not visible
 		this.displayDelay -= dt;					//   decrement display delay
 		if (this.displayDelay <= 0) {				//   if display delay <= 0
@@ -109,14 +109,13 @@ Gem.prototype.render = function() {
 
 //---------------------------------------------------------- Player Class
 var Player = function() {
-    // Variables applied to each of our instances go here,
     this.startLocation();		// place player at starting location
     this.sprite        = 'images/char-boy.png';
 	this.width         = 66;
-    this.lastTime      = 0;		// time of last player update
-    this.remainingTime = 0;		// time remaining in player game
+    this.lastTime      = 0;		// time of last player update (ms)
+    this.remainingTime = 0;		// time remaining in player game (ms)
     this.score         = 0;		// player score
-    this.pause         = 1;		// player paused
+    this.pause         = 1;		// player pause
     this.showInstructions = 1;
 };
 
@@ -129,8 +128,8 @@ Player.prototype.startLocation = function() {
 // update the player position and game situation
 Player.prototype.update = function(key) {
 	if (this.pause & key == 'space') {					// new game
-		this.showInstructions = 0;
-		ctx.globalAlpha = 1;
+		this.showInstructions = 0;						// only display instructions once
+		ctx.globalAlpha = 1;							// un-dim game
 		ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 		if (allEnemies.length > 5) {					// reduce enemies to 5
 			allEnemies.splice(5, allEnemies.length - 5);
@@ -140,7 +139,7 @@ Player.prototype.update = function(key) {
 		this.score          = 0;						// score 0
 		this.pause          = 0;						// unpause
 	}
-	else if (this.pause & key !== 'space') {			// ignore all but spacebar
+	else if (this.pause & key !== 'space') {			// ignore all but spacebar if paused
 	}
 	else if (key == 'up' & this.y > row[1]) {			// move up
 		this.y -= rowHeight;							// decrement y
@@ -176,7 +175,7 @@ Player.prototype.render = function() {
 	ctx.fillStyle = 'black';
 	ctx.textAlign = 'left';
 	ctx.fillText('SCORE: ' + ('0000'+player.score.toString()).slice(-4), 60, 40);
-	var displayRemaining = Math.floor((player.remainingTime + 999) / 1000);
+	var displayRemaining = Math.ceil(player.remainingTime / 1000);
 	ctx.fillText('TIME: ' + ('00'+displayRemaining.toString()).slice(-2), 300, 40);
 
 	if (player.pause) {									// if player paused
