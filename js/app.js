@@ -5,23 +5,23 @@ var numCols      =   5;
 var numRows      =   6;
 var colWidth     = 101;
 var rowHeight    =  83;
-var col = ['dummy'];	// use col & row arrays to find canvas x, y values by col, row indexes
-var row = ['dummy'];	// dummy values make col and row indexes 1-based
-for (var x=0; x<numCols; x++) {col.push(x*colWidth);};
-for (var y=0; y<numRows; y++) {row.push(y*rowHeight);};
+var col = ['dummy'];     // use col & row arrays to find canvas x, y values by col, row indexes
+var row = ['dummy'];     // dummy values make col and row indexes 1-based
+for (var x=0; x<numCols; x++) {col.push(x*colWidth);}
+for (var y=0; y<numRows; y++) {row.push(y*rowHeight);}
 
 // check for a collision between a single object and an array of objects
 var collides = function(obj1, array2) {
-	obj1x = obj1.x + ((colWidth - obj1.width) / 2);			// x of object1 left edge
+	var obj1x = obj1.x + ((colWidth - obj1.width) / 2);			// x of object1 left edge
 	var arrayLength = array2.length;
 	var collision   = 0;
 	for (var i=0; i<arrayLength; i++) {
-		obj2  = array2[i];
-		if (obj1 === obj2) { continue; };					// can't collide with yourself
-		obj2x = obj2.x + ((colWidth - obj2.width) / 2);		// x of object2 left edge
+		var obj2  = array2[i];
+		if (obj1 === obj2) { continue; }					// can't collide with yourself
+		var obj2x = obj2.x + ((colWidth - obj2.width) / 2);		// x of object2 left edge
 		// use bounding box collision detection
 		collision = collision || obj1.y == obj2.y && obj1x < (obj2x+obj2.width) && (obj1x+obj1.width) > obj2x;
-	};
+	}
 	return collision;
 };
 
@@ -50,10 +50,10 @@ Enemy.prototype.update = function(dt) {
 	if (collides(this, [player])) {							// if enemy collides with player
 		player.score = Math.max(0, player.score-100);		//   -100 points	
 		player.startLocation();								//   place player at starting location
-	};
+	}
 	if (this.x > canvasWidth) {		// if enemy moves off right of screen
 		this.randomize();			//   generate a random left of screen location
-	};
+	}
 };
 
 // draw an enemy on the screen
@@ -80,7 +80,7 @@ Gem.prototype.randomize = function() {
 // update the gem display
 // parameter: dt, a time delta between ticks
 Gem.prototype.update = function(dt) {
-	if (this.visible & collides(this, [player])) {	// if visible gem collides with player
+	if (this.visible && collides(this, [player])) {	// if visible gem collides with player
 		player.score += 200;						//   +200 points
 		this.visible = 0;							//   hide gem
 		this.randomize();							//   generate a random location, delay, and duration
@@ -90,14 +90,14 @@ Gem.prototype.update = function(dt) {
 		if (this.displayDuration <= 0) {			//   if display duration <= 0
 			this.visible = 0;						//     hide gem
 			this.randomize();						//     generate a random location, delay, and duration
-		};
+		}
 	}
     else if (!this.visible) {						// if gem is not visible
 		this.displayDelay -= dt;					//   decrement display delay
 		if (this.displayDelay <= 0) {				//   if display delay <= 0
 			this.visible = 1;						//     display gem
-		};
-    };
+		}
+    }
 };
 
 // draw the gem on the screen
@@ -127,7 +127,7 @@ Player.prototype.startLocation = function() {
 
 // update the player position and game situation
 Player.prototype.update = function(key) {
-	if (this.pause & key == 'space') {					// new game
+	if (this.pause && key == 'space') {					// new game
 		this.showInstructions = 0;						// only display instructions once
 		ctx.globalAlpha = 1;							// un-dim game
 		ctx.fillRect(0, 0, canvasWidth, canvasHeight);
@@ -139,32 +139,32 @@ Player.prototype.update = function(key) {
 		this.score          = 0;						// score 0
 		this.pause          = 0;						// unpause
 	}
-	else if (this.pause & key !== 'space') {			// ignore all but spacebar if paused
+	else if (this.pause && key !== 'space') {			// ignore all but spacebar if paused
 	}
-	else if (key == 'up' & this.y > row[1]) {			// move up
+	else if (key == 'up' && this.y > row[1]) {			// move up
 		this.y -= rowHeight;							// decrement y
 		if (this.y == row[1]) {							// if crossed road
 			this.score += 500;							//   +500 points
 			for (var i=0; i<2; i++) {					//	 add 2 enemies
-				enemy = new Enemy();
-			};
+				var enemy = new Enemy();
+			}
 			this.startLocation();						// place player at starting location
-		};
+		}
 	}
-	else if (key == 'down'  & this.y < row[6]) { this.y += rowHeight; }		// move down
-	else if (key == 'left'  & this.x > col[1]) { this.x -= colWidth;  }		// move left
-	else if (key == 'right' & this.x < col[5]) { this.x += colWidth;  };	// move right	
+	else if (key == 'down'  && this.y < row[6]) { this.y += rowHeight; }		// move down
+	else if (key == 'left'  && this.x > col[1]) { this.x -= colWidth;  }		// move left
+	else if (key == 'right' && this.x < col[5]) { this.x += colWidth;  }	// move right	
 
 	if (!this.pause) {
-		currentTime = Date.now();						// current time
+		var currentTime = Date.now();						// current time
 		var elapsedTime = currentTime - this.lastTime;	// time since last update (ms)
 		this.remainingTime -= elapsedTime;				// decrement remaining time
 		this.lastTime = currentTime;					// remember current time
 		if (this.remainingTime <= 0) {					// if game over
 			this.pause = 1;								// 	 pause
 			this.startLocation();						//   place player at starting location
-		};
-	};
+		}
+	}
 };
 
 // draw the player on the screen
@@ -179,7 +179,7 @@ Player.prototype.render = function() {
 	ctx.fillText('TIME: ' + ('00'+displayRemaining.toString()).slice(-2), 300, 40);
 
 	if (player.pause) {									// if player paused
-		ctx.globalAlpha = .5;							//   dim screen
+		ctx.globalAlpha = 0.5;							//   dim screen
 		ctx.fillRect(0, 0, canvasWidth, canvasHeight);
  		ctx.font      = '30px sans-serif';
 		ctx.fillStyle = 'white';
@@ -194,16 +194,16 @@ Player.prototype.render = function() {
 			ctx.fillText('Press spacebar to start.', canvasWidth/2, 440);
 		} else {										//   show play again instructions
 			ctx.fillText('Press spacebar to play again.', canvasWidth/2, 440);
-		};
-	};
+		}
+	}
 };
 
 //----------------------------------------------------------
 // instantiate enemy, gem, and player objects
 var allEnemies = [];		// enemy objects are contained in array allEnemies
 for (var i=0; i<5; i++) {	// start with 5 enemies
-	enemy = new Enemy();
-};
+	var enemy = new Enemy();
+}
 var gem = new Gem();
 var player = new Player();
 
