@@ -26,13 +26,27 @@ var collides = function(obj1, array2) {
 	return collision;
 };
 
+//------------------------------------------------------------ GameElement Super Class
+var GameElement = function(sprite, width) {
+    this.sprite = sprite;
+	this.width  = width;
+	this.x      = 0;
+	this.y      = 0;
+};
+
+// draw the element on the screen
+GameElement.prototype.render = function() {
+	ctx.drawImage(Resources.get(this.sprite), this.x, this.y-20);
+};
+
 //------------------------------------------------------------ Enemy Class
 var Enemy = function() {
-    this.sprite = 'images/enemy-bug.png';
-    this.width  = 96;
+	GameElement.call(this, 'images/enemy-bug.png', 96);
 	this.randomize();       // generate a random left of screen location
 	allEnemies.push(this);  // add this enemy to the allEnemies array
 };
+Enemy.prototype = Object.create(GameElement.prototype);
+Enemy.prototype.constructor = Enemy;
 
 // generate a left of screen location without overlap
 Enemy.prototype.randomize = function() {
@@ -49,26 +63,22 @@ Enemy.prototype.update = function(dt) {
     // movements are multiplied by dt to ensure consistent game speed across all computers
 	this.x += dt * (((this.y / ROW_HEIGHT) * 100));
 	if (collides(this, [player])) {                       // if enemy collides with player
-		player.score = Math.max(0, player.score - 100);     //   -100 points	
+		player.score = Math.max(0, player.score - 100);   //   -100 points	
 		player.startLocation();                           //   place player at starting location
 	}
-	if (this.x > CANVAS_WIDTH) {     // if enemy moves off right of screen
+	if (this.x > CANVAS_WIDTH) {    // if enemy moves off right of screen
 		this.randomize();           //   generate a random left of screen location
 	}
 };
 
-// draw an enemy on the screen
-Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y-20);
-};
-
 //---------------------------------------------------------- Gem Class
 var Gem = function() {
-    this.sprite      = 'images/Gem Blue.png';
-	this.width       = 96;
-    this.visible     = 0;
-	this.randomize();     // generate a random location, delay, and duration
+	GameElement.call(this, 'images/Gem Blue.png', 96);
+	this.visible = 0;
+	this.randomize();
 };
+Gem.prototype = Object.create(GameElement.prototype);
+Gem.prototype.constructor = Gem;
 
 // generate a random location, delay, and duration
 Gem.prototype.randomize = function() {
@@ -110,15 +120,16 @@ Gem.prototype.render = function() {
 
 //---------------------------------------------------------- Player Class
 var Player = function() {
+	GameElement.call(this, 'images/char-boy.png', 66);
     this.startLocation();       // place player at starting location
-    this.sprite        = 'images/char-boy.png';
-	this.width         = 66;
     this.lastTime      = 0;     // time of last player update (ms)
     this.remainingTime = 0;     // time remaining in player game (ms)
     this.score         = 0;     // player score
     this.pause         = 1;     // player pause
     this.showInstructions = 1;
 };
+Player.prototype = Object.create(GameElement.prototype);
+Player.prototype.constructor = Player;
 
 // place player at starting location
 Player.prototype.startLocation = function() {
@@ -146,7 +157,7 @@ Player.prototype.update = function(key) {
 		this.y -= ROW_HEIGHT;                      // decrement y
 		if (this.y == ROW_Y[1]) {                  // if crossed road
 			this.score += 500;                     //   +500 points
-			for (var i=0; i<2; i++) {              //   add 2 enemies
+			for (var i = 0; i < 2; i++) {          //   add 2 enemies
 				var enemy = new Enemy();
 			}
 			this.startLocation();                  // place player at starting location
