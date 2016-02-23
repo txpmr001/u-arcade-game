@@ -1,107 +1,106 @@
-// use semantic variables to make player location simpler and easier to understand
+// use semantic variables to make code simpler and easier to understand
 var canvasWidth  = 505;
 var canvasHeight = 606;
 var numCols      =   5;
 var numRows      =   6;
 var colWidth     = 101;
 var rowHeight    =  83;
-var col = ['dummy'];	// dummy values make col and row indexes 1-based
-var row = ['dummy'];
+var col = ['dummy'];	// use col & row arrays to find canvas x, y values by col, row indexes
+var row = ['dummy'];	// dummy values make col and row indexes 1-based
 for (var x=0; x<numCols; x++) {col.push(x*colWidth);};
 for (var y=0; y<numRows; y++) {row.push(y*rowHeight);};
 
+// check for a collision between a single object and an array of objects
 var collides = function(obj1, array2) {
-	obj1x = obj1.x + ((colWidth - obj1.width) / 2);
+	obj1x = obj1.x + ((colWidth - obj1.width) / 2);			// x of object1 left edge
 	var arrayLength = array2.length;
 	var collision   = 0;
 	for (var i=0; i<arrayLength; i++) {
 		obj2  = array2[i];
-		if (obj1 === obj2) { continue; };
-		obj2x = obj2.x + ((colWidth - obj2.width) / 2);
+		if (obj1 === obj2) { continue; };					// can't collide with yourself
+		obj2x = obj2.x + ((colWidth - obj2.width) / 2);		// x of object2 left edge
 		collision = collision || obj1.y == obj2.y && obj1x < (obj2x+obj2.width) && (obj1x+obj1.width) > obj2x;
 	};
 	return collision;
 };
 
 //------------------------------------------------------------ Enemy Class
-// Enemies our player must avoid
 var Enemy = function() {
-    // Variables applied to each of our instances go here,
     this.sprite = 'images/enemy-bug.png';
     this.width  = 96;
-	this.randomize();
-	allEnemies.push(this);
+	this.randomize();		// generate a random left of screen location
+	allEnemies.push(this);	// add this enemy to the allEnemies array
 };
 
+// generate a left of screen location without overlap
 Enemy.prototype.randomize = function() {
 	do {
-		this.x = (Math.floor((Math.random() * 1000) + colWidth)) * -1;
-		this.y = (Math.floor((Math.random() *    3) + 1)) * rowHeight;
+		this.x = (Math.floor((Math.random() * 1000) + colWidth)) * -1;	// x = -colWidth to -(999+colWidth)
+		this.y = (Math.floor((Math.random() *    3) + 1)) * rowHeight;	// y = row 1 to 3
 	} while (collides(this, allEnemies));
 };
 
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
+// update an enemy position
+// parameter: dt, a time delta between ticks
+// enemies move left to right
 Enemy.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
+    // movements are multiplied by dt to ensure consistent game speed across all computers
 	this.x += dt * (((this.y/rowHeight)*100));
-	if (collides(this, [player])) {
-		player.score = Math.max(0, player.score-100);
-		player.startLocation();
+	if (collides(this, [player])) {							// if enemy collides with player
+		player.score = Math.max(0, player.score-100);		//   -100 points	
+		player.startLocation();								//   place player at starting location
 	};
-	if (this.x > canvasWidth) {
-		this.randomize();
+	if (this.x > canvasWidth) {		// if enemy moves off right of screen
+		this.randomize();			//   generate a random left of screen location
 	};
 };
 
-// Draw the enemy on the screen, required method for game
+// draw an enemy on the screen
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y-20);
 };
 
 //---------------------------------------------------------- Gem Class
 var Gem = function() {
-    // Variables applied to each of our instances go here,
     this.sprite      = 'images/Gem Blue.png';
 	this.width       = 96;
     this.visible     = 0;
-	this.randomize();
+	this.randomize();		// generate a random location, delay, and duration
 };
 
+// generate a random location, delay, and duration
 Gem.prototype.randomize = function() {
-	this.x = col[Math.floor((Math.random() * 5) + 1)];			/* col 1 to 5     */
-	this.y = row[Math.floor((Math.random() * 3) + 2)];			/* row 2 to 4     */
-	this.displayWait = Math.floor((Math.random() * 5) + 3);		/* 3 to 7 seconds */
-	this.displayTime = Math.floor((Math.random() * 3) + 3);		/* 3 to 5 seconds */
+	this.x = col[Math.floor((Math.random() * 5) + 1)];				// col 1 to 5
+	this.y = row[Math.floor((Math.random() * 3) + 2)];				// row 2 to 4
+	this.displayDelay    = Math.floor((Math.random() * 6) + 3);		// delay   for 3 to 8 seconds
+	this.displayDuration = Math.floor((Math.random() * 3) + 3);		// display for 3 to 5 seconds
 };
 
+// update the gem display
+// parameter: dt, a time delta between ticks
 Gem.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
-	if (this.visible & collides(this, [player])) {
-		player.score += 200;
-		this.visible = 0;
-		this.randomize();
+	if (this.visible & collides(this, [player])) {	// if visible gem collides with player
+		player.score += 200;						//   +200 points
+		this.visible = 0;							//   hide gem
+		this.randomize();							//   generate a random location, delay, and duration
 	}
-	else if (this.visible) {
-		this.displayTime -= dt;
-		if (this.displayTime <= 0) {
-			this.visible = 0;
-			this.randomize();
+	else if (this.visible) {						// if gem is visible
+		this.displayDuration -= dt;					//   decrement display duration
+		if (this.displayDuration <= 0) {			//   if display duration <= 0
+			this.visible = 0;						//     hide gem
+			this.randomize();						//     generate a random location, delay, and duration
 		};
 	}
-    else if (!this.visible & this.displayWait > 0) {
-		this.displayWait -= dt;
-		if (this.displayWait <= 0) {
-			this.visible = 1;
+//  else if (!this.visible & this.displayDelay > 0) {	// if gem is not visible
+    else if (!this.visible) {						// if gem is not visible
+		this.displayDelay -= dt;					//   decrement display delay
+		if (this.displayDelay <= 0) {				//   if display delay <= 0
+			this.visible = 1;						//     display gem
 		};
     };
 };
 
-// Draw the enemy on the screen, required method for game
+// draw the gem on the screen
 Gem.prototype.render = function() {
 	if (this.visible) {
     	ctx.drawImage(Resources.get(this.sprite), this.x, this.y-20);
@@ -109,89 +108,84 @@ Gem.prototype.render = function() {
 };
 
 //---------------------------------------------------------- Player Class
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
 var Player = function() {
     // Variables applied to each of our instances go here,
-    this.startLocation();
+    this.startLocation();		// place player at starting location
     this.sprite        = 'images/char-boy.png';
 	this.width         = 66;
-    this.lastTime      = 0;
-    this.remainingTime = 0;
-    this.score         = 0;
-    this.pause         = 1;
+    this.lastTime      = 0;		// time of last player update
+    this.remainingTime = 0;		// time remaining in player game
+    this.score         = 0;		// player score
+    this.pause         = 1;		// player paused
     this.showInstructions = 1;
 };
 
-//
+// place player at starting location
 Player.prototype.startLocation = function() {
 	this.x = col[3];
 	this.y = row[6];
 };
 
-// Update the player's position, required method for game
+// update the player position and game situation
 Player.prototype.update = function(key) {
-	if (this.pause & key == 'space') {
+	if (this.pause & key == 'space') {					// new game
 		this.showInstructions = 0;
 		ctx.globalAlpha = 1;
 		ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-		if (allEnemies.length > 5) {
+		if (allEnemies.length > 5) {					// reduce enemies to 5
 			allEnemies.splice(5, allEnemies.length - 5);
 		}
-		this.lastTime       = Date.now();
-		this.remainingTime  = 60000;
-		this.score          = 0;
-		this.pause          = 0;
+		this.lastTime       = Date.now();				// time of last player update (ms)
+		this.remainingTime  = 60000;					// time remaining (ms)
+		this.score          = 0;						// score 0
+		this.pause          = 0;						// unpause
 	}
-	else if (this.pause & key !== 'space') {
+	else if (this.pause & key !== 'space') {			// ignore all but spacebar
 	}
-	else if (key == 'up' & this.y > row[1]) {
-		this.y -= rowHeight;
-		if (this.y == row[1]) {
-			this.score += 500;
-			for (var i=0; i<2; i++) {
+	else if (key == 'up' & this.y > row[1]) {			// move up
+		this.y -= rowHeight;							// decrement y
+		if (this.y == row[1]) {							// if crossed road
+			this.score += 500;							//   +500 points
+			for (var i=0; i<2; i++) {					//	 add 2 enemies
 				enemy = new Enemy();
 			};
-			this.startLocation();
+			this.startLocation();						// place player at starting location
 		};
 	}
-	else if (key == 'down'  & this.y < row[6]) { this.y += rowHeight; }
-	else if (key == 'left'  & this.x > col[1]) { this.x -= colWidth; }
-	else if (key == 'right' & this.x < col[5]) { this.x += colWidth; };
+	else if (key == 'down'  & this.y < row[6]) { this.y += rowHeight; }		// move down
+	else if (key == 'left'  & this.x > col[1]) { this.x -= colWidth;  }		// move left
+	else if (key == 'right' & this.x < col[5]) { this.x += colWidth;  };	// move right	
 
 	if (!this.pause) {
-		var thisTime    = Date.now();
-		var elapsedTime = Date.now() - this.lastTime;
-		this.remainingTime -= elapsedTime;
-		this.lastTime = thisTime;
-		console.log(elapsedTime + '     ' + player.remainingTime);
-		if (this.remainingTime <= 0) {
-			this.pause = 1;
-			this.startLocation();
+		currentTime = Date.now();						// current time
+		var elapsedTime = currentTime - this.lastTime;	// time since last update (ms)
+		this.remainingTime -= elapsedTime;				// decrement remaining time
+		this.lastTime = currentTime;					// remember current time
+		if (this.remainingTime <= 0) {					// if game over
+			this.pause = 1;								// 	 pause
+			this.startLocation();						//   place player at starting location
 		};
 	};
 };
 
-// Draw the player on the screen, required method for game
+// draw the player on the screen
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y-10);
-	ctx.clearRect(0, 0, canvasWidth, 50);
+	ctx.clearRect(0, 0, canvasWidth, 50);		// display score & time
 	ctx.font      = '30px sans-serif';
 	ctx.fillStyle = 'black';
 	ctx.textAlign = 'left';
 	ctx.fillText('SCORE: ' + ('0000'+player.score.toString()).slice(-4), 60, 40);
+	var displayRemaining = Math.floor((player.remainingTime + 999) / 1000);
+	ctx.fillText('TIME: ' + ('00'+displayRemaining.toString()).slice(-2), 300, 40);
 
-	var displayTime = Math.floor((player.remainingTime + 999) / 1000);
-	ctx.fillText('TIME: ' + ('00'+displayTime.toString()).slice(-2), 300, 40);
-
-	if (player.pause) {
-		ctx.globalAlpha = .5;
+	if (player.pause) {									// if player paused
+		ctx.globalAlpha = .5;							//   dim screen
 		ctx.fillRect(0, 0, canvasWidth, canvasHeight);
  		ctx.font      = '30px sans-serif';
 		ctx.fillStyle = 'white';
 		ctx.textAlign = 'center';
-		if (player.showInstructions) {
+		if (player.showInstructions) {					//   show instructions for 1st game
 			ctx.fillText('Use the arrow keys to move', canvasWidth/2, 160);
 			ctx.fillText('your character across the road', canvasWidth/2, 195);
 			ctx.fillText('to the water. (+500 pts)', canvasWidth/2, 230);
@@ -199,32 +193,29 @@ Player.prototype.render = function() {
 			ctx.fillText('Capture blue gems', canvasWidth/2, 330);
 			ctx.fillText('for bonus points. (+200 pts)', canvasWidth/2, 365);
 			ctx.fillText('Press spacebar to start.', canvasWidth/2, 440);
-		} else {
+		} else {										//   show play again instructions
 			ctx.fillText('Press spacebar to play again.', canvasWidth/2, 440);
 		};
 	};
 };
 
 //----------------------------------------------------------
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
-var allEnemies = [];
-for (var i=0; i<5; i++) {
+// instantiate enemy, gem, and player objects
+var allEnemies = [];		// enemy objects are contained in array allEnemies
+for (var i=0; i<5; i++) {	// start with 5 enemies
 	enemy = new Enemy();
 };
 var gem = new Gem();
 var player = new Player();
 
-// Decide what to do when a key is pressed
+// handle keyboard input
 var handleInput = function(key) {
 	if (['up', 'down', 'left', 'right', 'space'].indexOf(key) != -1) {
 		player.update(key);
 	}
 };
 
-// This listens for key presses and sends the keys to your
-// Player.handleInput() method. You don't need to modify this.
+// listen for keyboard input
 document.addEventListener('keyup', function(e) {
     var allowedKeys = {
     	32: 'space',
@@ -235,7 +226,3 @@ document.addEventListener('keyup', function(e) {
     };
     handleInput(allowedKeys[e.keyCode]);
 });
-
-
-
-
