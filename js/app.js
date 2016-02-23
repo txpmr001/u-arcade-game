@@ -1,6 +1,7 @@
 // use semantic constant variables to make code simpler and easier to understand
 var CANVAS_WIDTH  = 505;
 var CANVAS_HEIGHT = 606;
+var CANVAS_CENTER = CANVAS_WIDTH / 2;
 var NUM_COLS      =   5;
 var NUM_ROWS      =   6;
 var COL_WIDTH     = 101;
@@ -185,15 +186,15 @@ Player.prototype.render = function() {
 		ctx.fillStyle = 'white';
 		ctx.textAlign = 'center';
 		if (player.showInstructions) {        //   show instructions for 1st game
-			ctx.fillText('Use the arrow keys to move', CANVAS_WIDTH/2, 160);
-			ctx.fillText('your character across the road', CANVAS_WIDTH/2, 195);
-			ctx.fillText('to the water. (+500 pts)', CANVAS_WIDTH/2, 230);
-			ctx.fillText('Avoid enemy bugs. (-100 pts)', CANVAS_WIDTH/2, 280);
-			ctx.fillText('Capture blue gems', CANVAS_WIDTH/2, 330);
-			ctx.fillText('for bonus points. (+200 pts)', CANVAS_WIDTH/2, 365);
-			ctx.fillText('Press spacebar to start.', CANVAS_WIDTH/2, 440);
+			ctx.fillText('Use the arrow keys to move'    , CANVAS_CENTER, 160);
+			ctx.fillText('your character across the road', CANVAS_CENTER, 195);
+			ctx.fillText('to the water. (+500 pts)'      , CANVAS_CENTER, 230);
+			ctx.fillText('Avoid enemy bugs. (-100 pts)'  , CANVAS_CENTER, 280);
+			ctx.fillText('Capture blue gems'             , CANVAS_CENTER, 330);
+			ctx.fillText('for bonus points. (+200 pts)'  , CANVAS_CENTER, 365);
+			ctx.fillText('Press spacebar to start.'      , CANVAS_CENTER, 440);
 		} else {                              //   show play again instructions
-			ctx.fillText('Press spacebar to play again.', CANVAS_WIDTH/2, 440);
+			ctx.fillText('Press spacebar to play again.' , CANVAS_CENTER, 440);
 		}
 	}
 };
