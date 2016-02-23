@@ -179,13 +179,13 @@ Player.prototype.render = function() {
 	var displayRemaining = Math.ceil(player.remainingTime / 1000);
 	ctx.fillText('TIME: ' + ('00'+displayRemaining.toString()).slice(-2), 300, 40);
 
-	if (player.pause) {	                      // if player paused
+	if (this.pause) {	                      // if player paused
 		ctx.globalAlpha = 0.5;                //   dim screen
 		ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
  		ctx.font      = '30px sans-serif';
 		ctx.fillStyle = 'white';
 		ctx.textAlign = 'center';
-		if (player.showInstructions) {        //   show instructions for 1st game
+		if (this.showInstructions) {        //   show instructions for 1st game
 			ctx.fillText('Use the arrow keys to move'    , CANVAS_CENTER, 160);
 			ctx.fillText('your character across the road', CANVAS_CENTER, 195);
 			ctx.fillText('to the water. (+500 pts)'      , CANVAS_CENTER, 230);
