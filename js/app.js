@@ -213,7 +213,7 @@ Player.prototype.update = function(key) {
             /* accross the road */
             this.score += 500; // +500 points
             for (var i = 0; i < 2; i++) {
-                var enemy = new Enemy(); // add 2 enemies
+                app.enemy = new Enemy(); // add 2 enemies
             }
             this.startLocation(); // place player at starting location
         }
