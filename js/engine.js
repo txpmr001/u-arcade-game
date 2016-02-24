@@ -91,11 +91,11 @@ var Engine = (function(global) {
      * render methods.
      */
     function updateEntities(dt) {
-        allEnemies.forEach(function(enemy) {
+        app.allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
-        gem.update(dt);
-        player.update('dt');
+        app.gem.update(dt);
+        app.player.update('dt');
     }
 
     /* This function initially draws the "game level", it will then call
@@ -148,11 +148,11 @@ var Engine = (function(global) {
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
-        allEnemies.forEach(function(enemy) {
+        app.allEnemies.forEach(function(enemy) {
             enemy.render();
         });
-		gem.render();
-        player.render();
+		app.gem.render();
+        app.player.render();
     }
 
     /* This function does nothing but it could have been a good place to
