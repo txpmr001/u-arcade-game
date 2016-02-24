@@ -19,9 +19,9 @@ for (var y = 0; y < app.NUM_ROWS; y++) {
 }
 
 /**
-* @description Handle keyboard input
-* @param {string} key - the key that was pressed
-*/
+ * @description Handle keyboard input
+ * @param {string} key - the key that was pressed
+ */
 app.handleInput = function(key) {
     if (['up', 'down', 'left', 'right', 'space'].indexOf(key) != -1) {
         app.player.update(key); // if key in array, update player
@@ -29,11 +29,11 @@ app.handleInput = function(key) {
 };
 
 /**
-* @description Check for collisions between objects
-* @param {Object} obj1 - a single game object
-* @param {Array} array2 - an array of game objects
-* @returns {boolean} true if any collisions, false if no collisions
-*/
+ * @description Check for collisions between objects
+ * @param {Object} obj1 - a single game object
+ * @param {Array} array2 - an array of game objects
+ * @returns {boolean} true if any collisions, false if no collisions
+ */
 app.collides = function(obj1, array2) {
     var obj1x = obj1.x + ((app.COL_WIDTH - obj1.width) / 2); // x of object1 left edge
     var arrayLength = array2.length;
@@ -51,10 +51,10 @@ app.collides = function(obj1, array2) {
 };
 
 /**
-* @description Superclass for Enemy, Gem, and Player constructors
-* @param {string} sprite - filename of element image
-* @param {number} width - width of image in pixels
-*/
+ * @description Superclass for Enemy, Gem, and Player constructors
+ * @param {string} sprite - filename of element image
+ * @param {number} width - width of image in pixels
+ */
 var GameElement = function(sprite, width) {
     this.sprite = sprite;
     this.width = width;
@@ -63,16 +63,16 @@ var GameElement = function(sprite, width) {
 };
 
 /**
-* @description Draw the game element on the screen
-*/
+ * @description Draw the game element on the screen
+ */
 GameElement.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y - 20);
 };
 
 /**
-* @description Represents an enemy bug to be avoided by the player
-* @constructor
-*/
+ * @description Represents an enemy bug to be avoided by the player
+ * @constructor
+ */
 var Enemy = function() {
     GameElement.call(this, 'images/enemy-bug.png', 96); // Enemy superclass is GameElement
     this.randomize(); // generate a random left of screen location
@@ -82,8 +82,8 @@ Enemy.prototype = Object.create(GameElement.prototype);
 Enemy.prototype.constructor = Enemy;
 
 /**
-* @description Generate a left of screen location without overlap
-*/
+ * @description Generate a left of screen location without overlap
+ */
 Enemy.prototype.randomize = function() {
     do {
         this.x = (Math.floor((Math.random() * 1000) + app.COL_WIDTH)) * -1; // x = -app.COL_WIDTH to -(999+app.COL_WIDTH)
@@ -92,9 +92,9 @@ Enemy.prototype.randomize = function() {
 };
 
 /**
-* @description Update enemy position, check for collision, relocate if off right of screen
-* @param {number} dt - a time delta between ticks
-*/
+ * @description Update enemy position, check for collision, relocate if off right of screen
+ * @param {number} dt - a time delta between ticks
+ */
 Enemy.prototype.update = function(dt) {
     /* enemies move left to right
      * movements are multiplied by dt to ensure consistent game speed across all computers
@@ -110,9 +110,9 @@ Enemy.prototype.update = function(dt) {
 };
 
 /**
-* @description Represents a gem to be captured by the player for bonus points
-* @constructor
-*/
+ * @description Represents a gem to be captured by the player for bonus points
+ * @constructor
+ */
 var Gem = function() {
     GameElement.call(this, 'images/Gem Blue.png', 96); // Gem superclass is GameElement
     this.visible = 0; // initially hidden
@@ -122,8 +122,8 @@ Gem.prototype = Object.create(GameElement.prototype);
 Gem.prototype.constructor = Gem;
 
 /**
-* @description Generate a random location, delay, and duration
-*/
+ * @description Generate a random location, delay, and duration
+ */
 Gem.prototype.randomize = function() {
     this.x = app.COL_X[Math.floor((Math.random() * 5) + 1)]; // col 1 to 5
     this.y = app.ROW_Y[Math.floor((Math.random() * 3) + 2)]; // row 2 to 4
@@ -132,9 +132,9 @@ Gem.prototype.randomize = function() {
 };
 
 /**
-* @description Update gem display, check for collision, determine whether to hide or display 
-* @param {number} dt - a time delta between ticks
-*/
+ * @description Update gem display, check for collision, determine whether to hide or display 
+ * @param {number} dt - a time delta between ticks
+ */
 Gem.prototype.update = function(dt) {
     if (this.visible && app.collides(this, [app.player])) { // if visible gem collides with player
         app.player.score += 200; // +200 points
@@ -155,8 +155,8 @@ Gem.prototype.update = function(dt) {
 };
 
 /**
-* @description Draw the gem on the screen if visible
-*/
+ * @description Draw the gem on the screen if visible
+ */
 Gem.prototype.render = function() {
     if (this.visible) {
         ctx.drawImage(Resources.get(this.sprite), this.x, this.y - 20);
@@ -164,9 +164,9 @@ Gem.prototype.render = function() {
 };
 
 /**
-* @description Represents the game player
-* @constructor
-*/
+ * @description Represents the game player
+ * @constructor
+ */
 var Player = function() {
     GameElement.call(this, 'images/char-boy.png', 66); // Player superclass is GameElement
     this.startLocation(); // place player at starting location
@@ -180,17 +180,17 @@ Player.prototype = Object.create(GameElement.prototype);
 Player.prototype.constructor = Player;
 
 /**
-* @description Place player at starting location
-*/
+ * @description Place player at starting location
+ */
 Player.prototype.startLocation = function() {
     this.x = app.COL_X[3];
     this.y = app.ROW_Y[6];
 };
 
 /**
-* @description Update player position, show instructions when paused, update game situation 
-* @param {string} key - the key that was pressed, or 'dt' for timed update
-*/
+ * @description Update player position, show instructions when paused, update game situation 
+ * @param {string} key - the key that was pressed, or 'dt' for timed update
+ */
 Player.prototype.update = function(key) {
     if (this.pause && key == 'space') {
         /* new game */
@@ -219,13 +219,11 @@ Player.prototype.update = function(key) {
         }
     } else if (key == 'down' && this.y < app.ROW_Y[6]) {
         this.y += app.ROW_HEIGHT; // move down if not in last row
-    }
-    else if (key == 'left' && this.x > app.COL_X[1]) {
+    } else if (key == 'left' && this.x > app.COL_X[1]) {
         this.x -= app.COL_WIDTH; // move left if not in first column
-    }
-    else if (key == 'right' && this.x < app.COL_X[5]) {
+    } else if (key == 'right' && this.x < app.COL_X[5]) {
         this.x += app.COL_WIDTH; // move right if not in last column
-    } 
+    }
 
     /* if game is not paused, decrement remaining time and check to see if game is over */
     if (!this.pause) {
@@ -243,8 +241,8 @@ Player.prototype.update = function(key) {
 };
 
 /**
-* @description Draw player, score, remaining time, and instructions (if game paused) on the screen
-*/
+ * @description Draw player, score, remaining time, and instructions (if game paused) on the screen
+ */
 Player.prototype.render = function() {
     /* display player, score, and time */
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y - 10);
